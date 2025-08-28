@@ -19,10 +19,10 @@ export const createServer = async () => {
   const app = express();
   app.use(express.json());
 
-  const FRONTEND_ORIGINS = ["http://localhost:3000"];
+  // const FRONTEND_ORIGINS = ["http://localhost:3000"];
   app.use(
     cors({
-      origin: FRONTEND_ORIGINS,
+      origin: process.env.FRONTEND_ORIGINS,
       credentials: true,
     })
   );
@@ -33,7 +33,7 @@ export const createServer = async () => {
       resave: false,
       saveUninitialized: false,
       store: MongoStore.create({
-        mongoUrl: "mongodb://127.0.0.1:27017/meetapp",
+        mongoUrl:process.env.MONGOURI!,
       }),
       cookie: {
         secure: false,
@@ -49,14 +49,14 @@ export const createServer = async () => {
   app.use("/api/meeting", meetingRoutes);
 
   await mongoose
-    .connect("mongodb://127.0.0.1:27017/meetapp")
+    .connect(process.env.MONGOURI!)
     .then(() => console.log("MongoDB connected"))
     .catch((err) => console.error("MongoDB error:", err));
 
   const server = http.createServer(app);
   const io = new Server(server, {
     cors: {
-      origin: FRONTEND_ORIGINS,
+      origin: process.env.FRONTEND_ORIGINS,
       credentials: true,
     },
   });
